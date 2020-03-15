@@ -1,4 +1,4 @@
-var cardType=["CLAVER","DICE","HEARTS","SPADES"];
+var cardType=["1CLAVER","2DICE","3SPADES","4HEARTS"];
 var playerNames=["player0","player1","player2","player3"];
 var allcards=new Array();
 var playercards=new Array(4);
@@ -13,9 +13,11 @@ var noofplayers=playerNames.length;
 var parent=new Array(4); // parent getElementById for each player.
 var decks=new Array(4);  // deck for each player where they will place the cards
 var nextPlayer;
-var debug=1;
+var debug=0;
 var isCut =0;              // was the last put result in cut.
-var callBackVariable;
+var callBackVariable;      // variable used for stopping the timer
+var delay=2000;
+var gameFinished = 0;
 
 
 function initializedeck()
@@ -43,7 +45,17 @@ Player.prototype.isPlayerEmpty=function()
 		return 0;
 	return 1;
 }
-
+Player.prototype.checkForAvailibilityOfCardType=function (type)
+{
+	for(i = 0; i< this.cards.length; i++)
+	{
+		if(this.cards[i].type == type)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
 Player.prototype.putCard=function (type,value)
 {
 	var max=0;
@@ -52,6 +64,7 @@ Player.prototype.putCard=function (type,value)
 	{
 		comment.innerHTML=this.name +" HAS WON THE GAME.. STOPPING THE GAME.";
 		clearInterval(callBackVariable);
+		gameFinished = 1;
 		return;
 		//findNextPlayer(this)
 		//removePlayerFromArray(this);
@@ -74,7 +87,7 @@ Player.prototype.putCard=function (type,value)
 		
 	}
 	
-	//If he is a starter
+	//If he is a starter this round
 	if(type== undefined&&value==undefined)
 	{
 		// give better logic
@@ -110,6 +123,13 @@ Player.prototype.putCard=function (type,value)
 	ondeck2(max,this);
 	return max;
 };
+Player.prototype.sortCards=function()
+{
+	this.cards.sort(function(a, b) {
+		return a.id - b.id;
+	});
+}
+
 
 function removePlayerFromArray(playerToBeRemoved)
 {
@@ -154,10 +174,10 @@ function Card(value,type,owner,id,status)
 Card.prototype.toString=function()
 {
 	  	var txt,val=this.value,typ;
-	  	if(this.type=="CLAVER"){typ="c";}
-	  	else if(this.type=="DICE"){typ="d";}
-		else if(this.type=="HEARTS"){typ="h";}
-		else if(this.type=="SPADES"){typ="s";}
+	  	if(this.type=="1CLAVER"){typ="c";}
+	  	else if(this.type=="2DICE"){typ="d";}
+		else if(this.type=="4HEARTS"){typ="h";}
+		else if(this.type=="3SPADES"){typ="s";}
 	  	if(this.value==11){val="j";}
 	  	else if(this.value==12){val="q";}
 	  	else if(this.value==13){val="k";}
@@ -200,6 +220,24 @@ function findMaxCardonTable()
 }
 
 // Shuffle the cards and deal the cards
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
 function deal()
 {
 	initializedeck();
@@ -208,16 +246,24 @@ function deal()
 	{
 		for(j=0;j<cardType.length;j++)
 		{
-			allcards.push(new Card(i,cardType[k%4],playerNames[i%noofplayers],k,0));
+			allcards.push(new Card(i,cardType[k%4],playerNames[k%noofplayers],k,0));
 			k++;
 		}
 	}
+	shuffle(allcards);
+	k = 0;
     for(i=0;i<playerNames.length;i++)
     {
+		var j =0;
     	  playercards[i]=new Array();
-          playercards[i]=getPlayerCards(playerNames[i]);
+		  for (j=0;j<13;j++)
+		  {
+			  allcards[k].owner = playerNames[i];
+			  playercards[i].push(allcards[k]);
+			  k++;
+		  }
+		  playercards[i].sort(cardCompareFunction);
           playerobj.push(new Player(i, playerNames[i],playercards[i],decks[i]));
-         
     }
     userinterface();
     startgame();    	
@@ -371,19 +417,41 @@ function userinterface()
 	
 }
 
+
 // Putting card on deck for user i.e. player 0
 function ondeck(child,deck){
 	var i;
 	var txt;
 	
-     	for(i=0;i<playerobj[0].cards.length;i++)
-     	{
-     		if(child.id==playerobj[0].cards[i].id)
-     		{
-     			txt=playerobj[0].cards[i];
-     			break;
-     		}
-     	}
+	if( nextPlayer && 
+	    (nextPlayer.name != playerobj[0].name))
+	{
+		return;
+	}
+ 	for(i=0;i<playerobj[0].cards.length;i++)
+ 	{
+ 		if(child.id==playerobj[0].cards[i].id)
+ 		{
+ 			txt=playerobj[0].cards[i];
+ 			break;
+ 		}
+ 	}
+	if (cardontable[0])
+	{
+		if (cardontable[0].type != playerobj[0].cards[i].type)
+		{
+			if (playerobj[0].checkForAvailibilityOfCardType(cardontable[0].type))
+			{
+				comment.innerHTML="Hello, "+playerobj[0].name+" you have to put card of type "+cardontable[0].type;
+				return;
+			}
+			else
+			{
+				isCut = 1;
+			}
+		}
+	}
+	
 	cardontable.push(playerobj[0].cards[i]);
 	playerobj[0].cards.splice(i,1);
 	var deck=document.getElementById("player0deckcard");
@@ -401,7 +469,8 @@ function ondeck(child,deck){
 }
 // Putting card on deck for computer players i.e. player 1-3
 function ondeck2(card,player){
-	try{
+	try
+	{
 		
 		var txt=card;
 		txt="cards/"+txt+".gif";
@@ -413,9 +482,22 @@ function ondeck2(card,player){
 	
 }
 
+function cardCompareFunction(a,b)
+{
+	if (a.type == b.type)
+	{
+		return a.id - b.id;
+	}
+	return a.type.localeCompare(b.type); 
+}
 
-function startgame(){
+function startgame()
+{
 	var i;
+	for (i=0; i<playerobj.length; i++)
+	{
+		playerobj[i].cards.sort(cardCompareFunction);
+	}
 	for(i=0;i<allcards.length;i++)
 	{
 		if(allcards[i].type==cardType[3]&&allcards[i].value==MAX){
@@ -430,7 +512,7 @@ function startgame(){
 	nextPlayer.putCard(allcards[i].type,allcards[i].value);
 	findNextPlayerBasedOnCurrentPlayer(nextPlayer);
 	userinterface();
-	callBackVariable = setInterval(continueGame, 9000);
+	callBackVariable = setInterval(continueGame, delay);
 }
 
 
@@ -485,5 +567,7 @@ function continueGame(){
 	{
 		findNextPlayerBasedOnCurrentPlayer(nextPlayer);
 	}
+	if (gameFinished == 1)
+		return;
 	userinterface();
 }

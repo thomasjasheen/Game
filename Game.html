@@ -5,13 +5,13 @@
 <script src="Sample.js"></script>
 <link type="text/css" rel="stylesheet" href="style.css" >
 </link>
-<title>Insert title here</title>
+<title>CARDS GAME</title>
 </head>
 <body onload="deal()">
-<table border="1" id="table1" width="100%" height="100%">
-	<tr>
+<table style="height:100%;width:100%; position: absolute; top: 0; bottom: 0; left: 0; right: 0;" border="1">
+	<tr style="height: 20%;">
 		<td></td>
-		<td >
+		<td style="width: 55%;" >
 
 		<table id="player2">
 			<tr id="player2tr"></tr>
@@ -22,9 +22,9 @@
 		</td>
 		<td></td>
 	</tr>
-	<tr>
+	<tr  style="height: 60%;">
 		<td>
-		<table id="player1table">
+		<table id="player1table" align="middle">
 			
 		</table>
 
@@ -32,20 +32,20 @@
 		</td>
 		<td>
 
-		<table border="0" id="deck" width="100%" height="100%">
-			<tr>
-				<td></td>
-				<td class="card"><img id="player2deckcard"/></td>
-				<td></td>
+		<table border="1" id="deck" width="100%" height="100%">
+			<tr height="30%">
+				<td width="30%"></td>
+				<td class="card"><img id="player2deckcard" align="middle"/></td>
+				<td width="30%"></td>
 			</tr>
 			<tr>
-				<td class="card"><img id="player1deckcard"/> </td>
+				<td class="card" width="30%"><img id="player1deckcard"/> </td>
 				<td id="comment"></td>
-				<td class="card"><img id="player3deckcard"/></td>
+				<td class="card" width="30%"><img id="player3deckcard"/></td>
 			</tr>
 			<tr>
 				<td></td>
-				<td class="card"><img id="player0deckcard" /></td>
+				<td class="card" width="30%"><img id="player0deckcard" align="middle"/></td>
 				<td></td>
 			</tr>
 		</table>
@@ -58,7 +58,7 @@
 
 		</td>
 	</tr>
-	<tr>
+	<tr  style="height: 20%;">
 		<td></td>
 		<td>
 		<table id="player0" border="1" width="100%" height="100%">
