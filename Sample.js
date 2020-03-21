@@ -104,15 +104,8 @@ Player.prototype.putCard=function (type,value)
 	//If he is a starter this round
 	if(type== undefined&&value==undefined)
 	{
-		// give better logic
-		var k=Math.floor(Math.random() * this.cards.length);
-		max=this.cards[k];
-		cardontable.push(this.cards[k]);
-		ondeck2(this.cards[k],this);
-		this.cards.splice(k,1);
-		
-
-		return max;
+		putCardForStartingRound(this);
+		return;
 		
 	}
 	// Logic for now is to put largest card with same symbol
@@ -122,7 +115,6 @@ Player.prototype.putCard=function (type,value)
 		{
 			max=this.cards[i];
 			k=i;
-
 		}
 	}
 	/*give cut*/
@@ -144,6 +136,16 @@ Player.prototype.sortCards=function()
 	});
 }
 
+function putCardForStartingRound(player)
+{
+	// give better logic
+	var k=Math.floor(Math.random() * player.cards.length);
+	max=player.cards[k];
+	cardontable.push(player.cards[k]);
+	ondeck2(player.cards[k],player);
+	player.cards.splice(k,1);
+	return max;
+}
 
 function removePlayerFromArray(playerToBeRemoved)
 {
@@ -547,7 +549,6 @@ function startgame()
 
 function continueGame(){
 	var i;
-
 	if (isCut == 1)
 	{
 		isCut =0;
