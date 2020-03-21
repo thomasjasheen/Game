@@ -32,6 +32,7 @@ function initializedeck()
  parent[3]=document.getElementById("player3table");
  comment=document.getElementById("comment");
 }
+
 /*player object*/
 function Player(id, name,cards,deck){
 	this.id = id;
@@ -39,12 +40,15 @@ function Player(id, name,cards,deck){
 	this.cards=cards;
 	this.deck=deck;
 }
+
+
 Player.prototype.isPlayerEmpty=function()
 {
 	if (this.cards.length)
 		return 0;
 	return 1;
 }
+
 Player.prototype.checkForAvailibilityOfCardType=function (type)
 {
 	for(i = 0; i< this.cards.length; i++)
@@ -62,29 +66,39 @@ Player.prototype.putCard=function (type,value)
     // Assume that this player won the game so stop the game.
 	if (this.isPlayerEmpty())
 	{
-		comment.innerHTML=this.name +" HAS WON THE GAME.. STOPPING THE GAME.";
-		clearInterval(callBackVariable);
-		gameFinished = 1;
+		comment.innerHTML=this.name +" HAS FINISHED THE GAME...";
+//		clearInterval(callBackVariable);
+//		gameFinished = 1;
 		return;
 		//findNextPlayer(this)
 		//removePlayerFromArray(this);
 		
 	}
-	if (this.name == playerNames[0])
+	if (NoOfPlayersCurrentlyPlaying() == 1)
 	{
-		comment.innerHTML="please put the card player 0";
+		comment.innerHTML=this.name +" 	IS ASSSSSSS OF  THE GAME.. STOPPING THE GAME.";
+		clearInterval(callBackVariable);
+ 		gameFinished = 1;
 		return;
 	}
+		
+
 	
 	// Assume that this player won the game so stop the game.
 	if (this.isPlayerEmpty())
 	{
-		comment.innerHTML=this.name +" HAS WON THE GAME.. STOPPING THE GAME.";
+		comment.innerHTML=this.name +" HAS WON THE GAME...";
 		clearInterval(callBackVariable);
 		return;
 		//findNextPlayer(this)
 		//removePlayerFromArray(this);
 		
+	}
+	
+	if (this.name == playerNames[0])
+	{
+		comment.innerHTML="please put the card player 0";
+		return;
 	}
 	
 	//If he is a starter this round
@@ -143,6 +157,21 @@ function removePlayerFromArray(playerToBeRemoved)
 		}
 	}
 }
+
+function NoOfPlayersCurrentlyPlaying()
+{
+	var k=0;
+	var i=0;
+	for (i=0;i<playerobj.length; i++)
+	{
+		if (playerobj[i].cards.length > 0)
+		{
+			k++;
+		}
+	}
+	return k;
+}
+	
 function findNextPlayerBasedOnCurrentPlayer(player)
 {
 	var index = playerobj.indexOf(player);
@@ -519,7 +548,6 @@ function startgame()
 function continueGame(){
 	var i;
 
-	
 	if (isCut == 1)
 	{
 		isCut =0;
@@ -533,6 +561,7 @@ function continueGame(){
 			nextPlayer.cards.push(card);
 		}
 		round++;
+		nextPlayer.cards.sort(cardCompareFunction);
 		userinterface();
 		return;
 	}
@@ -541,7 +570,7 @@ function continueGame(){
 		document.write("ERROR CONDTION cardontable.length > playerobj.length" + cardontable.length +">"+playerobj.length);
 	}
 	// if all players have put the cards
-	if (cardontable.length == playerobj.length)
+	if (cardontable.length == NoOfPlayersCurrentlyPlaying())
 	{
 		var maxCardonTable = findMaxCardonTable();
 		nextPlayer = findPlayerObjBasedOnName(maxCardonTable.owner);
