@@ -7,6 +7,7 @@ var MAX=14;           //14 = ACE
 var comment;
 var starter;
 var round=0;
+var roundCompletedForEachTypeOfCard = new Array(4);
 var playerobj=new Array();
 var decks=new Array();
 var noofplayers=playerNames.length;
@@ -18,6 +19,7 @@ var isCut =0;              // was the last put result in cut.
 var callBackVariable;      // variable used for stopping the timer
 var delay=2000;
 var gameFinished = 0;
+var difficultylevel = 2;  // 
 
 
 function initializedeck()
@@ -106,27 +108,18 @@ Player.prototype.putCard=function (type,value)
 	{
 		putCardForStartingRound(this);
 		return;
-		
 	}
-	// Logic for now is to put largest card with same symbol
-	for(i=0;i<this.cards.length;i++)
+	
+	k = putCardBasedOnFirstCard(this, type);
+	
+	if (this.cards[k] == undefined)
 	{
-		if(this.cards[i].type==type)
-		{
-			max=this.cards[i];
-			k=i;
-		}
-	}
-	/*give cut*/
-	if(max==0)
-	{
-		k = findMaxCardPositionFromArray(this.cards);
-
-		isCut = 1;
+		document.write ("error retunred by putCardBasedOnFirstCard "+ k);
 	}
 	cardontable.push(this.cards[k]);
+	ondeck2(this.cards[k],this);
 	this.cards.splice(k,1);
-	ondeck2(max,this);
+
 	return max;
 };
 Player.prototype.sortCards=function()
@@ -139,12 +132,105 @@ Player.prototype.sortCards=function()
 function putCardForStartingRound(player)
 {
 	// give better logic
+	if (difficultylevel == 1)
+	{
 	var k=Math.floor(Math.random() * player.cards.length);
 	max=player.cards[k];
 	cardontable.push(player.cards[k]);
 	ondeck2(player.cards[k],player);
 	player.cards.splice(k,1);
 	return max;
+	}
+	
+	if (difficultylevel == 2)
+	{
+		var i =0;
+		var k =0;
+		var minIndex = 0;
+		var type;
+		var min;
+		min = roundCompletedForEachTypeOfCard[0];
+		for (i=0;i<roundCompletedForEachTypeOfCard.length; i++)
+		    if (min > roundCompletedForEachTypeOfCard[i])
+				minIndex =i;
+		if (player.checkForAvailibilityOfCardType(type) ==0)
+		{
+			// add logic 
+		}
+		type = cardType[minIndex];
+		if (roundCompletedForEachTypeOfCard[minIndex] < 2)
+		{
+			k = findMaxCardPositionFromArray(player.cards, type);
+		} else
+		{
+			k = findMinCardPositionFromArraywithType(player.cards, type);
+		}		
+	    cardontable.push(player.cards[k]);
+	    ondeck2(player.cards[k],player);
+	    player.cards.splice(k,1);		
+		return player.cards[k];
+	}
+}
+
+function findMaxCardOfType(playercards, type)
+{
+	var i;
+    var found =0;	
+	var k =0;
+	for(i=0;i<player_cards.length;i++)
+	{
+		if(player_cards[i].type==type)
+		{
+			max=player_cards[i];
+			k=i;
+			found = 1;
+		}
+	}
+	
+	
+}	
+function putCardBasedOnFirstCard(player, type)
+{
+	var max;
+	var found = 0;
+	var k  = 0;
+		
+	// Logic for now is to put largest card with same symbol
+	for(i=0;i<player.cards.length;i++)
+	{
+		if(player.cards[i].type==type)
+		{
+			max=player.cards[i];
+			k=i;
+			found = 1;
+		}
+	}
+	/*give cut*/
+	if(found == 0)
+	{
+		k = findMaxCardPositionFromArray(player.cards);
+
+		isCut = 1;
+		
+		return k;
+	}
+	
+	if (difficultylevel == 1)
+		return k;
+    
+    if (difficultylevel == 2)
+    {
+		if (roundCompletedForEachTypeOfCard[cardTypeToId(type)] < 2)
+		{
+			return k;
+		}
+		else
+		{	
+	        k = findMinCardPositionFromArraywithType(player.cards, type);		
+			return k;
+		}
+	}
+	
 }
 
 function removePlayerFromArray(playerToBeRemoved)
@@ -159,6 +245,18 @@ function removePlayerFromArray(playerToBeRemoved)
 		}
 	}
 }
+
+function cardTypeToId(type)
+{
+	var i =0;
+	for (i=0;i<cardType.length;i++)
+		if(type == cardType[i])
+			return i;
+	
+	document.write(" ERROR cardTypeToId Not worked "+type +" "+ i);
+	return -1;
+}
+	
 
 function NoOfPlayersCurrentlyPlaying()
 {
@@ -202,6 +300,7 @@ function Card(value,type,owner,id,status)
 	this.id=id;
 	this.status;
 }
+
 Card.prototype.toString=function()
 {
 	  	var txt,val=this.value,typ;
@@ -218,17 +317,63 @@ Card.prototype.toString=function()
        	return txt;
 };
 
-function findMaxCardPositionFromArray(arrayOfCards)
+function findMaxCardPositionFromArray(arrayOfCards, type)
 {
 	var max = arrayOfCards[0];
 	var i   = 0;
 	var k   = 0;
 	for(i=0;i<arrayOfCards.length-1;i++)
 	{
+		if (type == undefined)
+		{
 		if(max.value<arrayOfCards[i+1].value)
 		{
 			max=arrayOfCards[i+1];
 			k = i+1;
+		}
+		}
+		else
+		{	// there is bug here you have to find the first card of specifuc type and 
+            // assing that as max. then start the loop 
+			if ((type == arrayOfCards[i+1].type) && 
+			     (max.value<arrayOfCards[i+1].value))
+			{
+    			max=arrayOfCards[i+1];
+	    		k = i+1;
+		    }
+		}
+			
+	}
+	return k;
+}
+
+function findMinCardPositionFromArraywithType(arrayOfCards, type)
+{
+	var min = arrayOfCards[0];
+	var i   = 0;
+	var k   = 0;
+	for(i=0;i<arrayOfCards.length;i++)
+	{
+		if (arrayOfCards[i].type == type) 
+		{
+		  min = arrayOfCards[i];
+		  break;
+		}
+		k++;
+    }
+	//if type not found return the first card.
+	if ( k >=	arrayOfCards.length)
+		return 0;
+		
+	//k++;
+	for(i=k+1;i<arrayOfCards.length-1;i++)
+	{
+		if (arrayOfCards[i].type == type) 
+		{
+		  if (arrayOfCards[i].value - min.value > 1)
+		      return i-1;
+		  min = arrayOfCards[i];
+		  k++;
 		}
 	}
 	return k;
@@ -296,6 +441,9 @@ function deal()
 		  playercards[i].sort(cardCompareFunction);
           playerobj.push(new Player(i, playerNames[i],playercards[i],decks[i]));
     }
+	for (i =0; i<cardType.length; i++)
+		roundCompletedForEachTypeOfCard[i] =0;
+	
     userinterface();
     startgame();    	
 }
@@ -562,6 +710,7 @@ function continueGame(){
 			nextPlayer.cards.push(card);
 		}
 		round++;
+		roundCompletedForEachTypeOfCard[cardTypeToId(maxCardonTable.type)]++;
 		nextPlayer.cards.sort(cardCompareFunction);
 		userinterface();
 		return;
@@ -581,6 +730,7 @@ function continueGame(){
 		    cardontable.pop();
 		}
 		round++;
+		roundCompletedForEachTypeOfCard[cardTypeToId(maxCardonTable.type)]++;
 		userinterface();
 		return;
 	}
@@ -596,6 +746,11 @@ function continueGame(){
 	if (nextPlayer.name !=  playerNames[0])
 	{
 		findNextPlayerBasedOnCurrentPlayer(nextPlayer);
+	}
+	else if ((nextPlayer.name ==  playerNames[0]) && 
+	         (nextPlayer.isPlayerEmpty()))
+	{
+		 findNextPlayerBasedOnCurrentPlayer(nextPlayer);
 	}
 	if (gameFinished == 1)
 		return;
