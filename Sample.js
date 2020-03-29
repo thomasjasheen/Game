@@ -275,7 +275,13 @@ function NoOfPlayersCurrentlyPlaying()
 function findNextPlayerBasedOnCurrentPlayer(player)
 {
 	var index = playerobj.indexOf(player);
-	nextPlayer=playerobj[(index+1)%playerobj.length];
+	var nxtPlayer;
+	nxtPlayer=playerobj[(index+1)%playerobj.length];
+	if (nxtPlayer.isPlayerEmpty())
+	{
+		nxtPlayer=findNextPlayerBasedOnCurrentPlayer(nxtPlayer);
+	}
+	return nxtPlayer;
 }		
 
 function findPlayerObjBasedOnName(playerName)
@@ -520,7 +526,7 @@ function userinterface()
 		} 
  	    else if(i==0)
 		{
-			txt="cards/b2fv.gif";
+			txt="cards/b2fh.gif";
 		}
  	    else
 		{
@@ -570,7 +576,7 @@ function userinterface()
 		} 
  	    else if(i==0)
 		{
-			txt="cards/b2fv.gif";
+			txt="cards/b2fh.gif";
 		}
 	    else
 		{
@@ -643,7 +649,7 @@ function ondeck(child,deck){
 	
 	var parent=document.getElementById("player0tr");
 	parent.removeChild(child);	
-	findNextPlayerBasedOnCurrentPlayer(nextPlayer);
+	nextPlayer=findNextPlayerBasedOnCurrentPlayer(nextPlayer);
 
 }
 // Putting card on deck for computer players i.e. player 1-3
@@ -689,7 +695,7 @@ function startgame()
 	}
 	nextPlayer = findPlayerObjBasedOnName(starter);
 	nextPlayer.putCard(allcards[i].type,allcards[i].value);
-	findNextPlayerBasedOnCurrentPlayer(nextPlayer);
+	nextPlayer=findNextPlayerBasedOnCurrentPlayer(nextPlayer);
 	userinterface();
 	callBackVariable = setInterval(continueGame, delay);
 }
@@ -745,12 +751,12 @@ function continueGame(){
 	//no need to process further if current Player is user
 	if (nextPlayer.name !=  playerNames[0])
 	{
-		findNextPlayerBasedOnCurrentPlayer(nextPlayer);
+		nextPlayer=findNextPlayerBasedOnCurrentPlayer(nextPlayer);
 	}
 	else if ((nextPlayer.name ==  playerNames[0]) && 
 	         (nextPlayer.isPlayerEmpty()))
 	{
-		 findNextPlayerBasedOnCurrentPlayer(nextPlayer);
+		 nextPlayer=findNextPlayerBasedOnCurrentPlayer(nextPlayer);
 	}
 	if (gameFinished == 1)
 		return;

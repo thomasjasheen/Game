@@ -10,8 +10,8 @@
 <body onload="deal()">
 <table style="height:100%;width:100%; position: absolute; top: 0; bottom: 0; left: 0; right: 0;" border="1">
 	<tr style="height: 20%;">
-		<td style="width: 25%;"></td>
-		<td style="width: 50%;" >
+		<td style="width: 10%;"></td>
+		<td style="width: 80%;"    align="middle">
 
 		<table id="player2">
 			<tr id="player2tr"></tr>
@@ -20,7 +20,7 @@
 
 
 		</td>
-		<td style="width: 25%;"></td>
+		<td style="width: 10%;"></td>
 	</tr>
 	<tr  style="height: 60%;">
 		<td>
@@ -32,20 +32,22 @@
 		</td>
 		<td>
 
-		<table border="1" id="deck" width="100%" height="100%">
+		<table border="0" id="deck" width="100%" height="100%">
 			<tr height="30%">
 				<td width="30%"></td>
-				<td class="card"><img id="player2deckcard" align="middle"/></td>
+				<td class="card"  align="middle">
+			    	<img id="player2deckcard" align="middle"/>
+				</td>
 				<td width="30%"></td>
 			</tr>
 			<tr>
-				<td class="card" width="30%"><img id="player1deckcard"/> </td>
+				<td class="card" width="30%" align="left"><img id="player1deckcard" align="left"/> </td>
 				<td id="comment"></td>
-				<td class="card" width="30%"><img id="player3deckcard"/></td>
+				<td class="card" width="30%" align="right"><img id="player3deckcard" align="right"/></td>
 			</tr>
-			<tr>
+			<tr height="30%">
 				<td></td>
-				<td class="card" width="30%"><img id="player0deckcard" align="middle"/></td>
+				<td class="card" width="30%"  align="middle"><img id="player0deckcard" align="middle"/></td>
 				<td></td>
 			</tr>
 		</table>
@@ -61,7 +63,7 @@
 	<tr  style="height: 20%;">
 		<td></td>
 		<td>
-		<table id="player0" border="1" width="100%" height="100%">
+		<table id="player0" border="0" width="100%" height="100%"   align="middle">
 			<tr id="player0tr"></tr>
 		</table>
 
