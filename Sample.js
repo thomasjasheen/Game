@@ -1,5 +1,6 @@
 var cardType=["1CLAVER","2DICE","3SPADES","4HEARTS"];
-var playerNames=["player0","player1","player2","player3"];
+var playerNamex=["player0","player1","player2","player3"];
+var playerNames=["Tommy",  "Sunny",  "Alex",   "Ethan"];
 var allcards=new Array();
 var playercards=new Array(4);
 var cardontable=new Array();
@@ -78,7 +79,7 @@ Player.prototype.putCard=function (type,value)
 	}
 	if (NoOfPlayersCurrentlyPlaying() == 1)
 	{
-		comment.innerHTML=this.name +" 	IS ASSSSSSS OF  THE GAME.. STOPPING THE GAME.";
+		comment.innerHTML=this.name +" IS ASSSSSSS OF THE GAME.....\n\n\t  .THE GAME OVER.";
 		clearInterval(callBackVariable);
  		gameFinished = 1;
 		return;
@@ -494,8 +495,13 @@ function userinterface()
 	}
 	if (nextPlayer)
 	{
-		comment.innerHTML="Round "+round+": "+nextPlayer.name+" has to start the game";
+		comment.innerHTML="Round "+round+": "+nextPlayer.name+" has to put the card";
 	}
+	{
+	var td=document.createElement("td");
+	td.innerText = playerobj[0].name;
+	parent[0].appendChild(td);
+    }
 	for(i=0;i<playerobj[0].cards.length;i++)
     {  
 		
@@ -513,6 +519,13 @@ function userinterface()
     	td.id=playercards[0][i].id;
     	parent[0].appendChild(td);
    	}
+	{
+	var tr=document.createElement("tr");
+    var td=document.createElement("td");
+	tr.appendChild(td);
+	td.innerText = playerobj[3].name;
+	parent[3].appendChild(tr);
+    }
     for(i=0;i<playerobj[3].cards.length;i++)
 	{
     	var tr=document.createElement("tr");
@@ -537,9 +550,15 @@ function userinterface()
 	    td.setAttribute("class", "card");
 	    td.id=playercards[3][i].id;
 		tr.appendChild(td);
-	    document.getElementById("player3table").appendChild(tr);
+	    parent[3].appendChild(tr);
 	}
-    for(i=0;i<playerobj[2].cards.length;i++)
+	
+	{
+	var td=document.createElement("td");
+	td.innerText = playerobj[2].name;
+	document.getElementById("player2tr").appendChild(td);
+    }
+	for(i=0;i<playerobj[2].cards.length;i++)
     {
     	var td=document.createElement("td");
     	td.id=playercards[2][i].id;
@@ -562,6 +581,13 @@ function userinterface()
     	td.appendChild(img);
     	td.setAttribute("class", "card");
     	document.getElementById("player2tr").appendChild(td);
+    }
+	{
+	var tr=document.createElement("tr");
+    var td=document.createElement("td");
+	tr.appendChild(td);
+	td.innerText = playerobj[1].name;
+	parent[1].appendChild(tr);
     }
     for(i=0;i<playercards[1].length;i++)
  	{
@@ -721,11 +747,12 @@ function continueGame(){
 		userinterface();
 		return;
 	}
-	if (cardontable.length > playerobj.length)
+	if (cardontable.length > NoOfPlayersCurrentlyPlaying())
 	{
 		document.write("ERROR CONDTION cardontable.length > playerobj.length" + cardontable.length +">"+playerobj.length);
 	}
-	// if all players have put the cards
+	// if all players have put the cards 
+	// there is bug here if p0 started a round by putting his last card the number of players become 3 
 	if (cardontable.length == NoOfPlayersCurrentlyPlaying())
 	{
 		var maxCardonTable = findMaxCardonTable();
